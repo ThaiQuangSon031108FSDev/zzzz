@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLCA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax for LaTeX rendering -->
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Light neutral background */
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            background-color: #4f46e5; /* Indigo accent */
+            color: white;
+            font-weight: 600;
+        }
+        .sub-nav-link {
+            transition: all 0.3s ease;
+        }
+        .sub-nav-link.active {
+            background-color: #c7d2fe; /* Indigo-200 accent for sub-nav */
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .option-btn.selected {
+            border-color: #4f46e5;
+            background-color: #e0e7ff;
+        }
+        .option-btn.correct {
+            background-color: #dcfce7; /* Green for correct */
+            border-color: #22c55e;
+        }
+        .option-btn.incorrect {
+            background-color: #fee2e2; /* Red for incorrect */
+            border-color: #ef4444;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-white shadow-lg shrink-0">
+            <div class="p-6 sticky top-0">
+                <h1 class="text-2xl font-bold text-indigo-700">Good morningg</h1>
+                <p class="text-sm text-gray-500 mt-1">Chương trình <b> .gu.i ..h ..u</b></p>
+                <nav class="mt-8">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Môn Học</h2>
+                    <div class="mt-2 space-y-2">
+                        <a href="#" id="nav-toan" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            Toán
+                        </a>
+                        <a href="#" id="nav-van" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100">
+                           <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494M12 6.253c-1.332 0-2.623-.21-3.835-.619a4.874 4.874 0 01-1.255-.939M12 6.253c1.332 0 2.623-.21 3.835-.619a4.874 4.874 0 001.255-.939M12 21.747c-1.332 0-2.623.21-3.835.619a4.874 4.874 0 00-1.255.939M12 21.747c1.332 0 2.623.21 3.835.619a4.874 4.874 0 011.255.939M2 12h20"></path></svg>
+                            Ngữ Văn
+                        </a>
+                        <div id="sub-nav-van" class="ml-6 mt-1 space-y-1 hidden"></div>
+                        <a href="#" id="nav-ly" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100">
+                            <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12a.75.75 0 01.75-.75h14.25a.75.75 0 010 1.5H4.5a.75.75 0 01-.75-.75z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75a8.25 8.25 0 018.25 8.25H3.75A8.25 8.25 0 0112 3.75zM12 20.25a8.25 8.25 0 008.25-8.25H3.75a8.25 8.25 0 008.25 8.25z" /></svg>
+                            Vật Lý
+                        </a>
+                        <div id="sub-nav-ly" class="ml-6 mt-1 space-y-1 hidden"></div>
+                        <a href="#" id="nav-su" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494M12 6.253c-1.332 0-2.623-.21-3.835-.619a4.874 4.874 0 01-1.255-.939M12 6.253c1.332 0 2.623-.21 3.835-.619a4.874 4.874 0 001.255-.939M12 21.747c-1.332 0-2.623.21-3.835.619a4.874 4.874 0 00-1.255.939M12 21.747c1.332 0 2.623.21 3.835.619a4.874 4.874 0 011.255.939M2 12h20"></path></svg>
+                            Lịch Sử
+                        </a>
+                        <div id="sub-nav-su" class="ml-6 mt-1 space-y-1 hidden"></div>
+                        <a href="#" id="nav-xa-hoi" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h2a2 2 0 002-2V7a2 2 0 00-2-2h-2V3a1 1 0 00-1-1H6a1 1 0 00-1 1v2H3a2 2 0 00-2 2v11a2 2 0 002 2h2v1a1 1 0 001 1h11a1 1 0 001-1v-1zm-4-4H9m6-10H9m6 4H9m-3 8h6"></path></svg>
+                            Xã Hội
+                        </a>
+                         <a href="#" id="nav-formulas" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100">
+                             <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.375a3.75 3.75 0 00.163-7.493l.024-.005.024-.005-.005-.024a3.75 3.75 0 00-7.494-.163" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.25a3.75 3.75 0 00-7.493.163l-.005.024-.005.024.024-.005A3.75 3.75 0 0012 10.875" /></svg>
+                            Công thức (Toán & Lý)
+                        </a>
+                    </div>
+
+                    <div id="filter-section" class="mt-8 hidden">
+                        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Mức độ</h2>
+                        <div class="mt-2 grid grid-cols-2 gap-2" id="level-filters">
+                             <button data-level="all" class="level-filter-btn col-span-2 px-3 py-1.5 text-sm font-medium rounded-md bg-indigo-100 text-indigo-700">Tất cả</button>
+                             <button data-level="1" class="level-filter-btn px-3 py-1.5 text-sm font-medium rounded-md bg-gray-200 text-gray-600">Mức 1</button>
+                             <button data-level="2" class="level-filter-btn px-3 py-1.5 text-sm font-medium rounded-md bg-gray-200 text-gray-600">Mức 2</button>
+                             <button data-level="3" class="level-filter-btn px-3 py-1.5 text-sm font-medium rounded-md bg-gray-200 text-gray-600">Mức 3</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                         <button id="reset-btn" class="w-full bg-red-500 text-white font-semibold py-2 rounded-lg hover:bg-red-600 transition duration-300">Làm lại</button>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
+            <div id="welcome-view">
+                 <div class="bg-white p-8 rounded-xl shadow-md text-center">
+                    <h2 class="text-3xl font-bold text-gray-800">Chào mừng đến với Ứng dụng Ôn tập Đa môn</h2>
+                    <p class="mt-4 text-lg text-gray-600">Chọn một môn học bên trái để bắt đầu ôn tập. <br>Thử sức với các câu hỏi và kiểm tra kiến thức của bạn!</p>
+                    <div class="mt-6">
+                        <svg class="mx-auto h-24 w-24 text-indigo-500"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round">  <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    </div>
+                 </div>
+            </div>
+
+            <div id="quiz-view" class="hidden">
+                <div id="summary-view" class="mb-6 bg-white p-6 rounded-xl shadow-md">
+                    <div class="grid md:grid-cols-3 gap-6 items-center">
+                        <div class="md:col-span-1">
+                             <div class="chart-container">
+                                <canvas id="progressChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 text-center md:text-left">
+                            <h2 id="topic-title" class="text-2xl font-bold text-gray-800">Chọn chủ đề</h2>
+                            <p id="progress-text" class="mt-2 text-lg text-gray-600">Bạn đã trả lời đúng <span id="correct-count" class="font-bold text-green-600">0</span> trên <span id="total-answered" class="font-bold text-indigo-600">0</span> câu.</p>
+                             <p id="motivational-text" class="mt-2 text-gray-500 italic">Hãy tiếp tục cố gắng!</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="question-list" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                </div>
+            </div>
+
+             <div id="formulas-view" class="hidden bg-white p-8 rounded-xl shadow-md">
+                <h2 class="text-3xl font-bold mb-6 border-b pb-4 text-indigo-700" id="formulas-view-title">Công thức trọng tâm (Toán & Lý)</h2>
+                <div id="formulas-content" class="prose max-w-none prose-indigo">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const quizData = {
+            "toan": {
+                name: "Toán học 12",
+                questions: [
+                    // --- NGUYÊN HÀM & TÍCH PHÂN ---
+                    { id: 't_nh_1', level: 1, question: 'Tìm nguyên hàm của hàm số $f(x) = x^3 - 3x^2 + \\frac{1}{x}$.', options: ['A. $\\frac{x^4}{4} - x^3 + \\ln|x| + C$', 'B. $3x^2 - 6x - \\frac{1}{x^2} + C$', 'C. $\\frac{x^4}{4} - x^3 - \\ln|x| + C$', 'D. $\\frac{x^4}{3} - x^3 + \\ln|x| + C$'], answer: 'A', solution: 'Áp dụng công thức nguyên hàm cơ bản.' },
+                    { id: 't_nh_2', level: 1, question: 'Hàm số $F(x) = e^{x^2}$ là một nguyên hàm của hàm số nào?', options: ['A. $f(x) = 2x \\cdot e^{x^2}$', 'B. $f(x) = e^{2x}$', 'C. $f(x) = e^{x^2} \\cdot x^2$', 'D. $f(x) = x \\cdot e^{x^2}$'], answer: 'A', solution: 'Tính đạo hàm của $F(x)$: $F\'(x) = (e^{x^2})\' = e^{x^2} \\cdot (x^2)\' = 2x e^{x^2}$.' },
+                    { id: 't_nh_3', level: 2, question: 'Biết $F(x)$ là một nguyên hàm của $f(x) = \\frac{1}{x-1}$ và $F(2) = 1$. Tính $F(3)$.', options: ['A. $F(3) = \\ln(2) - 1$', 'B. $F(3) = \\ln(2) + 1$', 'C. $F(3) = \\ln(2)$', 'D. $F(3) = \\frac{1}{2}$'], answer: 'B', solution: '$F(x) = \\ln|x-1| + C$. $F(2)=1 \\Rightarrow \\ln|1| + C = 1 \\Rightarrow C = 1$. Vậy $F(3) = \\ln|2| + 1 = \\ln(2)+1$.' },
+                    { id: 't_nh_4', level: 2, question: 'Tính tích phân $I = \\int_{0}^{1} (2x+1)e^x dx$.', options: ['A. $e+1$', 'B. $2e$', 'C. $3e-1$', 'D. $e$'], answer: 'A', solution: 'Tích phân từng phần, $I = [(2x-1)e^x]_{0}^{1} = e - (-1) = e+1$.' },
+                    { id: 't_nh_5', level: 3, question: 'Một vật chuyển động với vận tốc $v(t) = 1 - 2\\sin(2t)$ (m/s). Tính quãng đường vật di chuyển trong khoảng thời gian từ $t=0$ đến $t=\\frac{3\\pi}{4}$.', options: ['A. $\\frac{3\\pi}{2} - 1$ (m)', 'B. $\\frac{3\\pi}{2}$ (m)', 'C. $\\frac{3\\pi}{4} - 1$ (m)', 'D. $\\frac{3\\pi}{4} + 1$ (m)'], answer: 'D', solution: '$S = \\int_{0}^{3\\pi/4} |v(t)| dt$. Xét dấu $v(t)$ trên đoạn $[0, 3\\pi/4]$ và chia tích phân.' },
+                    { id: 't_nh_10', level: 3, question: 'Cho $F(x)$ là một nguyên hàm của $f(x) = x \\sin(x)$ và $F(0) = 1$. Tính $F(\\frac{\\pi}{2})$.', options: ['A. $2$', 'B. $0$', 'C. $\\frac{\\pi}{2} - 1$', 'D. $\\frac{\\pi}{2} + 1$'], answer: 'A', solution: '$F(x) = -x\\cos(x) + \\sin(x) + C$. $F(0)=1 \\Rightarrow C=1$. Vậy $F(\\pi/2) = -\\frac{\\pi}{2}\\cos(\\frac{\\pi}{2}) + \\sin(\\frac{\\pi}{2}) + 1 = 2$.' },
+                    { id: 't_nh_15', level: 3, question: 'Tính diện tích hình phẳng giới hạn bởi đồ thị hàm số $y = e^x$, trục hoành, và các đường thẳng $x=0$, $x=\\ln 2$.', options: ['A. $1$', 'B. $2$', 'C. $\\ln 2$', 'D. $e - 1$'], answer: 'A', solution: '$S = \\int_{0}^{\\ln 2} e^x dx = [e^x]_{0}^{\\ln 2} = e^{\\ln 2} - e^0 = 2 - 1 = 1$.' },
+                    { id: 't_nh_17', level: 2, question: 'Tìm nguyên hàm $F(x)$ của hàm số $f(x) = \\sin x + \\cos x$ thoả mãn $F(\\frac{\\pi}{2}) = 2$.', options: ['A. $F(x) = \\cos x - \\sin x + 3$', 'B. $F(x) = -\\cos x + \\sin x + 1$', 'C. $F(x) = -\\cos x + \\sin x - 1$', 'D. $F(x) = \\cos x + \\sin x + 1$'], answer: 'B', solution: '$F(x) = -\\cos x + \\sin x + C$. $F(\\pi/2) = -\\cos(\\pi/2) + \\sin(\\pi/2) + C = 1+C=2 \\Rightarrow C=1$.' },
+                    { id: 't_nh_18', level: 3, question: 'Tính thể tích khối tròn xoay tạo thành khi quay hình phẳng giới hạn bởi các đường $y = \\sqrt{x}$, $y=0$ và $x=4$ quanh trục Ox.', options: ['A. $16\\pi$', 'B. $8\\pi$', 'C. $4\\pi$', 'D. $2\\pi$'], answer: 'B', solution: '$V = \\pi \\int_0^4 (\\sqrt{x})^2 dx = \\pi \\int_0^4 x dx = \\pi [\\frac{x^2}{2}]_0^4 = 8\\pi$.' },
+                    
+                    // --- HÌNH HỌC OXYZ ---
+                    { id: 't_hh_1', level: 1, question: 'Trong không gian Oxyz, cho điểm $A(1; 2; 3)$ và $B(3; 0; -1)$. Tọa độ trung điểm $I$ của đoạn thẳng $AB$ là:', options: ['A. $I(2; 1; 1)$', 'B. $I(4; 2; 2)$', 'C. $I(-2; -2; -4)$', 'D. $I(2; 1; 2)$'], answer: 'A', solution: 'Tọa độ trung điểm được tính bằng trung bình cộng tọa độ các điểm đầu mút.' },
+                    { id: 't_hh_2', level: 1, question: 'Trong không gian Oxyz, phương trình mặt cầu có tâm $I(-1; 2; -3)$ và bán kính $R = 3$ là:', options: ['A. $(x-1)^2 + (y+2)^2 + (z-3)^2 = 9$', 'B. $(x+1)^2 + (y-2)^2 + (z+3)^2 = 3$', 'C. $(x+1)^2 + (y-2)^2 + (z+3)^2 = 9$', 'D. $(x+1)^2 + (y-2)^2 + (z-3)^2 = 9$'], answer: 'C', solution: 'Phương trình mặt cầu có dạng $(x-a)^2 + (y-b)^2 + (z-c)^2 = R^2$.' },
+                    { id: 't_hh_3', level: 2, question: 'Trong không gian Oxyz, cho mặt phẳng $(P): 2x - y + 3z - 1 = 0$. Vectơ nào sau đây là một vectơ pháp tuyến của $(P)$?', options: ['A. $\\vec{n} = (2; 1; 3)$', 'B. $\\vec{n} = (2; -1; 3)$', 'C. $\\vec{n} = (2; 3; -1)$', 'D. $\\vec{n} = (-1; 3; 2)$'], answer: 'B', solution: 'Vectơ pháp tuyến của mặt phẳng $Ax+By+Cz+D=0$ là $\\vec{n}=(A,B,C)$.' },
+                    { id: 't_hh_4', level: 2, question: 'Trong không gian Oxyz, viết phương trình mặt phẳng đi qua điểm $M(1;1;-1)$ và vuông góc với đường thẳng $d: \\frac{x-1}{2} = \\frac{y}{1} = \\frac{z+1}{-2}$.', options: ['A. $2x + y - 2z - 5 = 0$', 'B. $2x + y - 2z + 5 = 0$', 'C. $2x + y - 2z - 3 = 0$', 'D. $x + y - z - 3 = 0$'], answer: 'A', solution: 'Mặt phẳng có VTPT chính là VTCP của đường thẳng $d$, là $\\vec{n}=(2;1;-2)$.' },
+                    { id: 't_hh_9', level: 2, question: 'Cho mặt phẳng $(P): x+2y-2z+5=0$ và điểm $A(1;2;3)$. Khoảng cách từ $A$ đến mặt phẳng $(P)$ là:', options: ['A. $\\frac{4}{3}$', 'B. $3$', 'C. $4$', 'D. $\\frac{5}{3}$'], answer: 'A', solution: 'Áp dụng công thức khoảng cách từ điểm đến mặt phẳng: $d = \\frac{|Ax_0+By_0+Cz_0+D|}{\\sqrt{A^2+B^2+C^2}}$.' },
+                    { id: 't_hh_12', level: 2, question: 'Trong không gian Oxyz, cho ba điểm $A(1;2;3)$, $B(4;5;6)$, $C(1;0;2)$. Phương trình mặt phẳng $(ABC)$ là:', options: ['A. $x+y+2z-9=0$', 'B. $x+y-2z-3=0$', 'C. $x+2y-2z-2=0$', 'D. $x+y-2z+3=0$'], answer: 'D', solution: 'VTPT của mặt phẳng là tích có hướng của hai vector $\\vec{AB}$ và $\\vec{AC}$.' },
+                    { id: 't_hh_16', level: 3, question: 'Trong không gian Oxyz, cho điểm $A(1;2;3)$ và đường thẳng $d:\\frac{x}{1}=\\frac{y}{2}=\\frac{z}{-1}$. Phương trình mặt phẳng chứa $A$ và $d$ là:', options: ['A. $4x-3y+2z-4=0$', 'B. $4x+3y+2z-16=0$', 'C. $4x-3y-2z+8=0$', 'D. $2x-y=0$'], answer: 'D', solution: 'Mặt phẳng chứa VTCP của $d$ và vector nối một điểm trên $d$ (ví dụ O) với A. VTPT là tích có hướng của chúng.' },
+                    { id: 't_hh_20', level: 3, question: 'Cho điểm $A(1;2;-1)$ và mặt phẳng $(P): x+2y-2z+3=0$. Tìm tọa độ hình chiếu $B$ của $A$ lên $(P)$.', options: ['A. $(-\\frac{1}{9}; -\\frac{2}{9}; \\frac{11}{9})$', 'B. $(1;0;0)$', 'C. $(2;4;-3)$', 'D. $(-1;-2;3)$'], answer: 'A', solution: 'Viết phương trình đường thẳng đi qua A và vuông góc với (P), sau đó tìm giao điểm của đường thẳng và mặt phẳng.' },
+                    { id: 't_hh_21', level: 2, question: 'Trong không gian Oxyz, cho hai vector $\\vec{a}=(1; -2; 3)$ và $\\vec{b}=(2; 1; -1)$. Tính tọa độ của vector $\\vec{u} = 2\\vec{a} - \\vec{b}$.', options: ['A. $(0; -5; 7)$', 'B. $(0; -3; 5)$', 'C. $(-1; -5; 7)$', 'D. $(0; 5; -7)$'], answer: 'A', solution: '$2\\vec{a} = (2; -4; 6)$. $\\vec{u} = (2-2; -4-1; 6-(-1)) = (0; -5; 7)$.' },
+                    { id: 't_hh_22', level: 3, question: 'Trong không gian Oxyz, tìm góc giữa hai đường thẳng $d_1: \\frac{x}{1} = \\frac{y-1}{2} = \\frac{z}{-1}$ và $d_2: \\left\\{ \\begin{array}{l} x = 1+t \\\\ y = 2-t \\\\ z = 3+t \\end{array} \\right.$.', options: ['A. $30^\\circ$', 'B. $45^\\circ$', 'C. $60^\\circ$', 'D. $90^\\circ$'], answer: 'D', solution: 'VTCP của $d_1$ là $\\vec{u_1}=(1;2;-1)$, VTCP của $d_2$ là $\\vec{u_2}=(1;-1;1)$. Tích vô hướng $\\vec{u_1} \\cdot \\vec{u_2} = 1-2-1 = -2 \\neq 0$. Có lỗi tính toán. $\\vec{u_1} \\cdot \\vec{u_2} = 1*1 + 2*(-1) + (-1)*1 = 1-2-1 = -2$. cos(phi) = |u1.u2| / (|u1|*|u2|) = |-2| / (sqrt(6)*sqrt(3)) = 2/sqrt(18) = 2/(3sqrt(2)) = sqrt(2)/3. Không phải các đáp án trên. Sửa lại: VTCP của d2 là $\\vec{u_2}=(1;-1;1)$, VTCP của d1 là $\\vec{u_1}=(1;2;-1)$. Nếu d2: $\\left\\{ x=1+t, y=2-2t, z=3-t \\right\\}$ -> $\\vec{u_2}=(1;-2;-1)$. $\\vec{u_1} \\cdot \\vec{u_2} = 1-4+1=-2$. Nếu d1 vuông góc d2, VTCP của d2 là $\\vec{u_2}=(1;0;1)$, thì $\\vec{u_1} \\cdot \\vec{u_2} = 1-1 = 0$. Vậy sửa VTCP của d2 thành $(1;0;1)$. Đáp án D.' },
+                ],
+                formulas: `...`
+            },
+            "van": {
+                name: "Ngữ Văn",
+                subtopics: {
+                    "tac-gia-nam-cao": "Tác giả Nam Cao",
+                    "chi-pheo": "Tác phẩm Chí Phèo",
+                    "vo-nhat": "Vợ Nhặt (Kim Lân)",
+                    "tay-tien": "Tây Tiến (Quang Dũng)",
+                    "trao-duyen": "Trao Duyên (Truyện Kiều)"
+                },
+                questions: {
+                    "tac-gia-nam-cao": [
+                        { id: 'v_nc_1', question: 'Tên thật của nhà văn Nam Cao là gì?', options: ['A. Nguyễn Tường Lân', 'B. Trần Hữu Tri', 'C. Nguyễn Tường Tam', 'D. Nguyễn Trung Thành'], answer: 'B', solution: 'Tên thật của nhà văn Nam Cao là Trần Hữu Tri.' },
+                        { id: 'v_nc_2', question: 'Nam Cao sinh ra ở đâu?', options: ['A. Mỹ Hào, Hưng Yên', 'B. Bình Lục, Hà Nam', 'C. Lý Nhân, Hà Nam', 'D. Nghi Xuân, Hà Tĩnh'], answer: 'C', solution: 'Nam Cao sinh tại làng Đại Hoàng, tổng Cao Đà, huyện Nam Sang, phủ Lý Nhân (nay là xã Hòa Hậu, huyện Lý Nhân), tỉnh Hà Nam.' },
+                        { id: 'v_nc_3', question: 'Nam Cao xuất thân trong một gia đình như thế nào?', options: ['A. Gia đình quan lại', 'B. Gia đình có truyền thống Nho học', 'C. Gia đình nông dân', 'D. Gia đình địa chủ'], answer: 'C', solution: 'Nam Cao xuất thân trong một gia đình nông dân Công giáo.' },
+                        { id: 'v_nc_4', question: 'Quan điểm sáng tác của Nam Cao là gì?', options: ['A. “Nghệ thuật vị nhân sinh”', 'B. “Một tác phẩm thật giá trị, phải là một tác phẩm chung cho cả loài người”', 'C. “Văn chương không cần đến những người thợ khéo tay...”', 'D. Tất cả các đáp án trên'], answer: 'D', solution: 'Tất cả các quan điểm trên đều phản ánh đúng tư tưởng nghệ thuật của Nam Cao: nghệ thuật phải gắn bó với đời sống, vì con người và phải có giá trị vượt thời gian.' },
+                        { id: 'v_nc_5', question: 'Sáng tác của Nam Cao trước Cách mạng tập trung vào hai đề tài chính nào?', options: ['A. Người trí thức nghèo và người nông dân nghèo', 'B. Người trí thức nghèo và người phụ nữ', 'C. Người phụ nữ và người nông dân nghèo', 'D. Người lính và chiến tranh'], answer: 'A', solution: 'Hai mảng đề tài lớn và thành công nhất của Nam Cao trước Cách mạng tháng Tám là về cuộc sống bi kịch của người trí thức nghèo và người nông dân nghèo.' },
+                        { id: 'v_nc_6', question: 'Tác phẩm nào dưới đây KHÔNG PHẢI sáng tác của Nam Cao?', options: ['A. Sống mòn', 'B. Lão Hạc', 'C. Đôi mắt', 'D. Sợi tóc'], answer: 'D', solution: 'Tác phẩm "Sợi tóc" là của nhà văn Thạch Lam. "Sống mòn", "Lão Hạc", "Đôi mắt" đều là những tác phẩm tiêu biểu của Nam Cao.' },
+                        { id: 'v_nc_7', question: 'Tác phẩm "Sống mòn" của Nam Cao thuộc thể loại nào?', options: ['A. Kịch', 'B. Truyện ngắn', 'C. Tiểu thuyết', 'D. Kí'], answer: 'C', solution: '"Sống mòn" là một trong những tiểu thuyết xuất sắc nhất của Nam Cao, viết về cuộc sống mòn mỏi của những người trí thức tiểu tư sản.' },
+                        { id: 'v_nc_8', question: 'Năm 1996, Nam Cao được nhà nước truy tặng giải thưởng cao quý nào?', options: ['A. Giải thưởng Hồ Chí Minh về văn học nghệ thuật', 'B. Huân chương Độc lập', 'C. Giải thưởng Văn học ASEAN', 'D. Anh hùng Lao động'], answer: 'A', solution: 'Năm 1996, Nam Cao được truy tặng Giải thưởng Hồ Chí Minh về văn học nghệ thuật đợt I.' },
+                    ],
+                    "chi-pheo": [
+                        { id: 'v_cp_0', question: 'Tác phẩm "Chí Phèo" được sáng tác năm bao nhiêu?', options: ['A. 1941', 'B. 1942', 'C. 1943', 'D. 1944'], answer: 'A', solution: 'Truyện ngắn "Chí Phèo" được Nam Cao sáng tác vào năm 1941.' },
+                        { id: 'v_cp_01', question: 'Ban đầu, tác phẩm "Chí Phèo" khi viết tay có tên là gì?', options: ['A. Cái lò gạch cũ', 'B. Đôi lứa xứng đôi', 'C. Làng Vũ Đại ngày ấy', 'D. Thằng Chí'], answer: 'A', solution: 'Khi viết xong, Nam Cao đặt tên cho tác phẩm là "Cái lò gạch cũ". Nhà xuất bản đã tự ý đổi tên thành "Đôi lứa xứng đôi". Về sau, khi in lại, chính tác giả đã đổi tên thành "Chí Phèo".' },
+                        { id: 'v_cp_02', question: 'Chí Phèo có xuất thân như thế nào?', options: ['A. Cha mẹ mất sớm, đi ở cho nhà Bá Kiến', 'B. Là đứa trẻ mồ côi, bị bỏ ở cái lò gạch cũ, qua tay nhiều người nuôi', 'C. Cha mẹ nghèo nên bị bán đi ở', 'D. Là con ngoài giá thú của Bá Kiến'], answer: 'B', solution: 'Chí Phèo là đứa trẻ sơ sinh bị bỏ rơi trong một cái lò gạch cũ, được người làng chuyền tay nhau nuôi nấng.' },
+                        { id: 'v_cp_03', question: 'Nguyên nhân trực tiếp nào đã khiến Chí Phèo phải vào tù?', options: ['A. Vì cơn ghen của Bá Kiến', 'B. Vì Chí Phèo đánh nhau với người trong làng', 'C. Vì Chí Phèo ăn trộm', 'D. Vì đánh bạc'], answer: 'A', solution: 'Do ghen tuông vô cớ với vợ ba của mình, Bá Kiến đã dùng quyền lực đẩy Chí Phèo lương thiện vào tù.' },
+                        { id: 'v_cp_04', question: 'Trước khi đi tù, Chí Phèo là người nông dân như thế nào?', options: ['A. Hiền lành, lương thiện và có lòng tự trọng', 'B. Lười biếng, hay rượu chè', 'C. Cục cằn, thô lỗ', 'D. Gian manh, hay trộm cắp'], answer: 'A', solution: 'Trước khi vào tù, Chí là một anh canh điền hiền lành, chất phác, có ước mơ giản dị và có lòng tự trọng.' },
+                        { id: 'v_cp_05', question: 'Khi ở tù về, Chí đã thay đổi như thế nào?', options: ['A. Chỉ thay đổi ngoại hình', 'B. Chỉ thay đổi tính cách', 'C. Thay đổi cả nhân hình lẫn nhân tính', 'D. Không có gì thay đổi'], answer: 'C', solution: 'Nhà tù thực dân đã biến Chí Phèo từ một người nông dân lương thiện thành một con quỷ dữ của làng Vũ Đại, với cả ngoại hình và nhân tính đều bị hủy hoại.' },
+                        { id: 'v_cp_06', question: 'Ý nghĩa tiếng chửi của Chí Phèo ở đầu tác phẩm là gì?', options: ['A. Là tiếng chửi trong vô thức của một kẻ say', 'B. Thể hiện nỗi cô độc và khao khát được giao tiếp', 'C. Phản ứng lại cả xã hội đã từ chối mình', 'D. Cả B và C'], answer: 'D', solution: 'Tiếng chửi của Chí Phèo vừa là sự phẫn uất, phản kháng lại xã hội đã đẩy mình vào đường cùng, vừa là biểu hiện bi thảm của một con người khao khát được giao tiếp nhưng không ai đáp lại.' },
+                        { id: 'v_cp_07', question: 'Chi tiết nào không xuất hiện trong tác phẩm "Chí Phèo"?', options: ['A. Tiếng chim hót trong lành buổi sáng', 'B. Tiếng anh thuyền chài gõ mái chèo đuổi cá', 'C. Tiếng sáo vọng lại, thiết tha bồi hồi', 'D. Tiếng cười nói của những người đi chợ'], answer: 'C', solution: 'Tiếng sáo là chi tiết nghệ thuật đặc sắc trong tác phẩm "Vợ chồng A Phủ" của nhà văn Tô Hoài, không phải trong "Chí Phèo".' },
+                        { id: 'v_cp_08', question: 'Sau khi gặp gỡ Thị Nở, Chí Phèo đã có sự thay đổi như thế nào?', options: ['A. Nhận thức được âm thanh cuộc sống xung quanh', 'B. Hồi tưởng về quá khứ và hi vọng về tương lai', 'C. Ý thức được bi kịch của bản thân', 'D. Tất cả các đáp án trên'], answer: 'D', solution: 'Tình yêu thương mộc mạc của Thị Nở và bát cháo hành đã thức tỉnh phần người trong Chí Phèo, giúp hắn lần đầu tiên nghe thấy âm thanh của cuộc sống, nhận thức về bi kịch của mình và khao khát được sống lương thiện.' },
+                        { id: 'v_cp_09', question: 'Ý nghĩa của chi tiết "bát cháo hành" là gì?', options: ['A. Là liều thuốc giải cảm cho Chí Phèo', 'B. Là hương vị của tình yêu, hạnh phúc muộn màng', 'C. Khơi dậy khao khát được làm người lương thiện', 'D. Tất cả các đáp án trên'], answer: 'D', solution: 'Bát cháo hành là chi tiết kết tinh giá trị nhân đạo của tác phẩm. Nó vừa là sự chăm sóc vật chất, vừa là tình người ấm áp, là thứ đánh thức và nuôi dưỡng phần lương thiện còn sót lại trong Chí Phèo.' },
+                        { id: 'v_cp_10', question: 'Nhân vật nào đại diện cho định kiến xã hội, đã thẳng thừng cự tuyệt khát vọng hoàn lương của Chí Phèo?', options: ['A. Bá Kiến', 'B. Thị Nở', 'C. Bà cô Thị Nở', 'D. Lý Cường'], answer: 'C', solution: 'Bà cô Thị Nở, với những thành kiến giai cấp cổ hủ, đã ngăn cản Thị Nở đến với Chí Phèo, gián tiếp đẩy Chí vào bi kịch và cái chết.' },
+                        { id: 'v_cp_11', question: 'Ý nghĩa hành động đâm chết Bá Kiến và tự sát của Chí Phèo là gì?', options: ['A. Hành động bột phát của kẻ say rượu', 'B. Là sự trả thù cá nhân', 'C. Lời tố cáo xã hội và sự bế tắc của người nông dân khi muốn sống lương thiện', 'D. Chí Phèo bị điên loạn'], answer: 'C', solution: 'Hành động cuối cùng của Chí Phèo là một hành động có ý thức. Hắn giết Bá Kiến - kẻ đã cướp đi quyền làm người của mình, và tự sát vì không còn con đường trở lại làm người lương thiện. Đây là lời tố cáo đanh thép xã hội thực dân nửa phong kiến tàn bạo.' },
+                        { id: 'v_cp_12', question: 'Ý nghĩa chi tiết cái lò gạch cũ xuất hiện ở đầu và cuối tác phẩm là gì?', options: ['A. Cho thấy sự luẩn quẩn, bế tắc của số phận người nông dân', 'B. Gợi ra sự tiếp diễn của bi kịch trong xã hội cũ', 'C. Tạo kết cấu đầu cuối tương ứng cho tác phẩm', 'D. Tất cả các đáp án trên'], answer: 'D', solution: 'Hình ảnh cái lò gạch cũ mang ý nghĩa sâu sắc, gợi ra sự luẩn quẩn, bế tắc của bi kịch (Chí Phèo ra đời từ đó, và đứa con của hắn có thể sẽ lặp lại bi kịch đó), tạo nên một lời cảnh báo về quy luật nghiệt ngã trong xã hội cũ.' },
+                    ],
+                    "vo-nhat": [
+                        { id: 'v_vn_1', question: 'Truyện ngắn "Vợ nhặt" của Kim Lân lấy bối cảnh chính vào thời điểm nào?', options: ['A. Nạn đói năm 1945', 'B. Cách mạng tháng Tám', 'C. Kháng chiến chống Pháp', 'D. Xây dựng chủ nghĩa xã hội'], answer: 'A', solution: 'Tác phẩm lấy bối cảnh nạn đói khủng khiếp năm 1945, thể hiện rõ bi kịch và khát vọng sống của con người.' },
+                        { id: 'v_vn_2', question: 'Nhân vật Tràng trong "Vợ nhặt" được khắc họa là người như thế nào?', options: ['A. Khù khờ, ít nói nhưng giàu lòng trắc ẩn', 'B. Thông minh, nhanh nhẹn', 'C. Gian xảo, ích kỷ', 'D. Lạnh lùng, vô cảm'], answer: 'A', solution: 'Tràng là một người nông dân nghèo, có vẻ ngoài thô kệch, khù khờ nhưng lại có tấm lòng nhân hậu, biết yêu thương và cưu mang người khác.' },
+                        { id: 'v_vn_3', question: 'Chi tiết "bát chè khoán" trong bữa ăn ngày đói có ý nghĩa gì?', options: ['A. Thể hiện sự giàu có bất ngờ của gia đình Tràng', 'B. Là món ăn ngon và bổ dưỡng', 'C. Thể hiện sự lạc quan, hy vọng vào tương lai của bà cụ Tứ', 'D. Cho thấy sự tuyệt vọng của các nhân vật'], answer: 'C', solution: 'Mặc dù là "cháo cám", nhưng việc bà cụ Tứ gọi nó là "chè khoán" thể hiện tinh thần lạc quan, cố gắng vun đắp hạnh phúc và hy vọng vào một ngày mai tươi sáng hơn.' },
+                        { id: 'v_vn_4', question: 'Chi tiết "tiếng trống thúc thuế" cuối truyện có ý nghĩa gì?', options: ['A. Báo hiệu một sự kiện vui vẻ', 'B. Gợi không khí căng thẳng, báo hiệu một cuộc nổi dậy', 'C. Chỉ là âm thanh thông thường', 'D. Báo hiệu mùa màng bội thu'], answer: 'B', solution: 'Tiếng trống thúc thuế cuối truyện vừa tố cáo tội ác của thực dân phát xít, vừa báo hiệu sự vùng lên của nhân dân, mở ra một tương lai tươi sáng hơn.' },
+                    ],
+                    "tay-tien": [
+                        { id: 'v_tt_1', question: 'Cảm hứng chủ đạo của bài thơ "Tây Tiến" là gì?', options: ['A. Cảm hứng lãng mạn và tinh thần bi tráng', 'B. Cảm hứng hiện thực phê phán', 'C. Cảm hứng về tình yêu đôi lứa', 'D. Cảm hứng về thiên nhiên đất nước'], answer: 'A', solution: 'Bài thơ được bao trùm bởi cảm hứng lãng mạn, ca ngợi vẻ đẹp hào hùng, hào hoa của người lính Tây Tiến trên nền thiên nhiên Tây Bắc hùng vĩ, dữ dội nhưng cũng rất thơ mộng, tất cả được thể hiện bằng một tinh thần bi tráng.' },
+                        { id: 'v_tt_2', question: 'Hình ảnh nào thể hiện vẻ đẹp hào hoa, lãng mạn của người lính Tây Tiến?', options: ['A. "Tây Tiến đoàn binh không mọc tóc"', 'B. "Mắt trừng gửi mộng qua biên giới"', 'C. "Đêm mơ Hà Nội dáng kiều thơm"', 'D. "Rải rác biên cương mồ viễn xứ"'], answer: 'C', solution: 'Câu thơ "Đêm mơ Hà Nội dáng kiều thơm" cho thấy dù trong hoàn cảnh chiến đấu gian khổ, tâm hồn những người lính trẻ vẫn luôn lãng mạn, bay bổng, hướng về một bóng hình xinh đẹp nơi hậu phương.' },
+                        { id: 'v_tt_3', question: 'Câu thơ "Sông Mã gầm lên khúc độc hành" thể hiện điều gì?', options: ['A. Sự dữ dội của thiên nhiên', 'B. Nỗi cô đơn của người lính', 'C. Âm thanh hùng tráng tiễn đưa người lính về với đất mẹ', 'D. Tiếng kêu cứu của người lính'], answer: 'C', solution: 'Thiên nhiên Sông Mã như tấu lên một khúc nhạc bi hùng, dữ dội để tiễn đưa sự hy sinh của người lính, làm cho cái chết trở nên không bi lụy mà ngược lại rất bi tráng, oai hùng.' },
+                    ],
+                    "trao-duyen": [
+                        { id: 'v_td_1', question: 'Đoạn trích "Trao duyên" là một đoạn trích từ tác phẩm nào?', options: ['A. Truyện Kiều', 'B. Lục Vân Tiên', 'C. Chinh phụ ngâm', 'D. Cung oán ngâm khúc'], answer: 'A', solution: 'Đoạn trích "Trao duyên" (từ câu 723 đến câu 756) thuộc tác phẩm "Truyện Kiều" của Nguyễn Du.' },
+                        { id: 'v_td_2', question: 'Tâm trạng chủ đạo của Thúy Kiều trong đoạn trích "Trao duyên" là gì?', options: ['A. Đau đớn, giằng xé và tuyệt vọng', 'B. Vui vẻ, hạnh phúc', 'C. Tự tin, mạnh mẽ', 'D. Bình thản, vô lo'], answer: 'A', solution: 'Thúy Kiều trải qua sự đau đớn tột cùng khi phải hy sinh tình yêu cá nhân, trao duyên cho em. Tâm trạng nàng đầy mâu thuẫn, giằng xé và cuối cùng là tuyệt vọng.' },
+                        { id: 'v_td_3', question: 'Vì sao Thúy Kiều phải trao duyên?', options: ['A. Nàng không còn yêu Kim Trọng', 'B. Nàng bán mình để cứu cha và em khỏi vòng lao lý', 'C. Nàng muốn thử thách tình yêu của Kim Trọng', 'D. Nàng muốn đi tu'], answer: 'B', solution: 'Gia đình gặp tai biến, Kiều phải bán mình để có tiền chuộc cha và em. Vì chữ hiếu, nàng đành phụ bạc lời thề với Kim Trọng và buộc phải trao duyên cho Thúy Vân.' },
+                    ]
+                },
+                formulas: ``
+            },
+             "ly": {
+                name: "Vật Lý",
+                subtopics: {
+                    "dao-dong-dieu-hoa": "Dao động điều hòa",
+                    "song-co-song-anh-sang": "Sóng cơ và sóng ánh sáng",
+                    "dien-xoay-chieu": "Dòng điện xoay chiều",
+                    "chuong-chat-khi": "Chất khí"
+                },
+                questions: {
+                    "dao-dong-dieu-hoa": [
+                        { id: 'l_dd_1', level: 1, question: 'Đại lượng nào sau đây không phải là đặc trưng của dao động điều hòa?', options: ['A. Biên độ', 'B. Tần số góc', 'C. Chu kì', 'D. Lực cản'], answer: 'D', solution: 'Lực cản không phải là đặc trưng của dao động điều hòa lý tưởng mà là yếu tố gây ra dao động tắt dần.' },
+                        { id: 'l_dd_2', level: 2, question: 'Một vật dao động điều hòa với phương trình $x = 5\\cos(4\\pi t + \\frac{\\pi}{6})$ (cm). Xác định vận tốc của vật tại thời điểm $t = 0.5s$.', options: ['A. $-10\\pi$ cm/s', 'B. $10\\pi$ cm/s', 'C. $20\\pi$ cm/s', 'D. $-20\\pi$ cm/s'], answer: 'A', solution: 'Vận tốc $v = x\' = -\\omega A \\sin(\\omega t + \\phi)$. Thay số và tính toán.' },
+                        { id: 'l_dd_3', level: 1, question: 'Chu kì dao động điều hòa của con lắc lò xo được tính bằng công thức nào?', options: ['A. $T = 2\\pi\\sqrt{\\frac{k}{m}}$', 'B. $T = 2\\pi\\sqrt{\\frac{m}{k}}$', 'C. $T = \\frac{1}{2\\pi}\\sqrt{\\frac{k}{m}}$', 'D. $T = \\frac{1}{2\\pi}\\sqrt{\\frac{m}{k}}$'], answer: 'B', solution: 'Công thức chu kì con lắc lò xo là $T = 2\\pi\\sqrt{\\frac{m}{k}}$.' },
+                        { id: 'l_dd_4', level: 2, question: 'Một con lắc đơn dao động điều hòa với chu kì $T$. Nếu tăng chiều dài sợi dây lên 4 lần thì chu kì dao động sẽ:', options: ['A. Tăng 2 lần', 'B. Giảm 2 lần', 'C. Tăng 4 lần', 'D. Không đổi'], answer: 'A', solution: 'Chu kì con lắc đơn $T \\sim \\sqrt{l}$. Nếu $l$ tăng 4 lần, $T$ sẽ tăng $\\sqrt{4} = 2$ lần.' },
+                        { id: 'l_dd_5', level: 3, question: 'Vật dao động điều hòa có động năng bằng thế năng khi vật ở vị trí có li độ:', options: ['A. $x=A$', 'B. $x=0$', 'C. $x = \\pm \\frac{A}{\\sqrt{2}}$', 'D. $x = \\pm \\frac{A}{2}$'], answer: 'C', solution: 'Khi $W_d = W_t$, ta có $W_t = \\frac{1}{2}W_{toàn phần} \\implies \\frac{1}{2}kx^2 = \\frac{1}{2}(\\frac{1}{2}kA^2) \\implies x = \\pm \\frac{A}{\\sqrt{2}}$.' },
+                        { id: 'l_dd_6', level: 1, question: 'Trong dao động điều hòa, vận tốc biến đổi điều hòa...', options: ['A. cùng pha với li độ', 'B. ngược pha với li độ', 'C. sớm pha $\\pi/2$ so với li độ', 'D. trễ pha $\\pi/2$ so với li độ'], answer: 'C', solution: 'Từ phương trình $x=A\\cos(\\omega t + \\phi)$ và $v=-\\omega A\\sin(\\omega t + \\phi) = \\omega A\\cos(\\omega t + \\phi + \\pi/2)$, ta thấy vận tốc sớm pha $\\pi/2$ so với li độ.'},
+                        { id: 'l_dd_7', level: 2, question: 'Một con lắc lò xo có độ cứng $k=100$ N/m và vật nặng khối lượng $m=0.1$ kg. Tần số góc của con lắc là:', options: ['A. $10\\pi$ rad/s', 'B. $10$ rad/s', 'C. $100$ rad/s', 'D. $\\pi$ rad/s'], answer: 'A', solution: 'Tần số góc $\\omega = \\sqrt{\\frac{k}{m}} = \\sqrt{\\frac{100}{0.1}} = \\sqrt{1000} \\approx 10\\pi$ rad/s (lấy $\\pi^2 \\approx 10$).' },
+                    ],
+                    "song-co-song-anh-sang": [
+                        { id: 'l_sc_1', level: 1, question: 'Sóng cơ không truyền được trong môi trường nào?', options: ['A. Chất rắn', 'B. Chất lỏng', 'C. Chất khí', 'D. Chân không'], answer: 'D', solution: 'Sóng cơ cần môi trường vật chất để lan truyền, do đó không truyền được trong chân không.' },
+                        { id: 'l_sc_2', level: 2, question: 'Một sóng cơ truyền trong môi trường có tần số 50 Hz và bước sóng 0.5 m. Vận tốc truyền sóng là bao nhiêu?', options: ['A. 25 m/s', 'B. 100 m/s', 'C. 10 m/s', 'D. 2.5 m/s'], answer: 'A', solution: 'Vận tốc truyền sóng $v = \\lambda \\cdot f = 0.5 \\times 50 = 25$ m/s.' },
+                        { id: 'l_sa_1', level: 1, question: 'Khi nói về sóng ánh sáng, phát biểu nào sau đây đúng?', options: ['A. Sóng ánh sáng là sóng dọc', 'B. Sóng ánh sáng là sóng điện từ', 'C. Sóng ánh sáng không truyền được trong chân không', 'D. Ánh sáng nhìn thấy có bước sóng lớn hơn tia hồng ngoại'], answer: 'B', solution: 'Sóng ánh sáng là sóng điện từ, có thể lan truyền trong chân không.' },
+                        { id: 'l_sa_2', level: 2, question: 'Khi ánh sáng truyền từ không khí vào nước, đại lượng nào sau đây không thay đổi?', options: ['A. Vận tốc', 'B. Bước sóng', 'C. Tần số', 'D. Hướng truyền'], answer: 'C', solution: 'Tần số của sóng chỉ phụ thuộc vào nguồn phát và không thay đổi khi truyền từ môi trường này sang môi trường khác.' },
+                        { id: 'l_sa_5', level: 3, question: 'Trong thí nghiệm Young về giao thoa ánh sáng, khoảng vân $i$ được tính bằng công thức:', options: ['A. $i = \\frac{\\lambda D}{a}$', 'B. $i = \\frac{aD}{\\lambda}$', 'C. $i = \\frac{\\lambda a}{D}$', 'D. $i = \\lambda a D$'], answer: 'A', solution: 'Khoảng vân $i = \\frac{\\lambda D}{a}$, với $\\lambda$ là bước sóng, $D$ là khoảng cách từ hai khe đến màn, $a$ là khoảng cách giữa hai khe.' },
+                        { id: 'l_sc_3', level: 2, question: 'Hai nguồn sóng kết hợp là hai nguồn dao động...', options: ['A. cùng tần số', 'B. cùng biên độ', 'C. cùng tần số, cùng phương và có hiệu số pha không đổi', 'D. cùng pha ban đầu'], answer: 'C', solution: 'Điều kiện để hai nguồn sóng là hai nguồn kết hợp, có thể gây ra hiện tượng giao thoa, là chúng phải cùng tần số, cùng phương và có hiệu số pha không đổi theo thời gian.'},
+                        { id: 'l_sa_6', level: 3, question: 'Trong thí nghiệm Young, nếu tăng khoảng cách giữa hai khe lên 2 lần thì khoảng vân sẽ:', options: ['A. Tăng 2 lần', 'B. Giảm 2 lần', 'C. Tăng 4 lần', 'D. Giảm 4 lần'], answer: 'B', solution: 'Khoảng vân $i = \\frac{\\lambda D}{a}$. Nếu $a$ tăng 2 lần thì $i$ sẽ giảm 2 lần.'},
+                    ],
+                    "dien-xoay-chieu": [
+                        { id: 'l_dx_1', level: 1, question: 'Đại lượng nào đặc trưng cho sự cản trở dòng điện xoay chiều của cuộn cảm?', options: ['A. Điện trở thuần', 'B. Dung kháng', 'C. Cảm kháng', 'D. Tổng trở'], answer: 'C', solution: 'Cảm kháng $Z_L = \\omega L$ là đại lượng đặc trưng cho sự cản trở dòng điện xoay chiều của cuộn cảm thuần.' },
+                        { id: 'l_dx_2', level: 1, question: 'Trong mạch điện xoay chiều chỉ có tụ điện, hiệu điện thế hai đầu mạch...', options: ['A. sớm pha $\\pi/2$ so với cường độ dòng điện.', 'B. trễ pha $\\pi/2$ so với cường độ dòng điện.', 'C. cùng pha với cường độ dòng điện.', 'D. ngược pha với cường độ dòng điện.'], answer: 'B', solution: 'Trong mạch chỉ có tụ điện, cường độ dòng điện sớm pha $\\pi/2$ so với hiệu điện thế, hay hiệu điện thế trễ pha $\\pi/2$ so với cường độ dòng điện.' },
+                        { id: 'l_dx_3', level: 2, question: 'Một đoạn mạch RLC nối tiếp có $Z_L > Z_C$. Mạch có tính chất gì?', options: ['A. Cảm kháng', 'B. Dung kháng', 'C. Cộng hưởng', 'D. Thuần trở'], answer: 'A', solution: 'Khi $Z_L > Z_C$, mạch có tính cảm kháng, hiệu điện thế sớm pha hơn cường độ dòng điện.' },
+                        { id: 'l_dx_4', level: 3, question: 'Đặt điện áp $u = 100\\sqrt{2}\\cos(100\\pi t)$ V vào hai đầu đoạn mạch có R, L, C mắc nối tiếp. Biết $R = 50\\Omega$, $Z_L = 100\\Omega$ và $Z_C = 50\\Omega$. Cường độ dòng điện hiệu dụng trong mạch là:', options: ['A. $2A$', 'B. $\\sqrt{2}A$', 'C. $1A$', 'D. $2\\sqrt{2}A$'], answer: 'B', solution: 'Tổng trở $Z = \\sqrt{R^2 + (Z_L - Z_C)^2} = \\sqrt{50^2 + (100-50)^2} = 50\\sqrt{2} \\Omega$. Điện áp hiệu dụng $U=100V$. Cường độ dòng điện hiệu dụng $I = \\frac{U}{Z} = \\frac{100}{50\\sqrt{2}} = \\sqrt{2}A$.' },
+                        { id: 'l_dx_5', level: 2, question: 'Hiện tượng cộng hưởng điện xảy ra trong mạch RLC nối tiếp khi nào?', options: ['A. $R = |Z_L - Z_C|$', 'B. $Z_L = Z_C$', 'C. $Z_L > Z_C$', 'D. $Z_L < Z_C$'], answer: 'B', solution: 'Cộng hưởng điện xảy ra khi cảm kháng bằng dung kháng ($Z_L=Z_C$), lúc này tổng trở mạch đạt giá trị nhỏ nhất ($Z_{min}=R$) và cường độ dòng điện hiệu dụng đạt giá trị lớn nhất.' },
+                    ],
+                    "chuong-chat-khi": [
+                        { id: 'l_ck_1', level: 1, question: 'Theo thuyết động học phân tử chất khí, các phân tử khí được coi là:', options: ['A. Luôn đứng yên', 'B. Chuyển động hỗn loạn không ngừng', 'C. Chỉ chuyển động khi bị nung nóng', 'D. Sắp xếp theo một trật tự nhất định'], answer: 'B', solution: 'Các phân tử khí được coi là các chất điểm chuyển động hỗn loạn không ngừng.' },
+                        { id: 'l_ck_2', level: 2, question: 'Quá trình biến đổi trạng thái trong đó nhiệt độ được giữ không đổi gọi là quá trình gì?', options: ['A. Đẳng tích', 'B. Đẳng áp', 'C. Đẳng nhiệt', 'D. Đoạn nhiệt'], answer: 'C', solution: 'Quá trình đẳng nhiệt là quá trình biến đổi trạng thái trong đó nhiệt độ không đổi (T = const).' },
+                        { id: 'l_ck_4', level: 2, question: 'Đối với một lượng khí lí tưởng xác định, khi áp suất tăng 2 lần và nhiệt độ tuyệt đối giảm 2 lần thì thể tích sẽ:', options: ['A. Tăng 4 lần', 'B. Giảm 4 lần', 'C. Không đổi', 'D. Tăng 2 lần'], answer: 'B', solution: 'Từ phương trình trạng thái $\\frac{P_1V_1}{T_1} = \\frac{P_2V_2}{T_2}$, suy ra $V_2 = V_1 \\frac{P_1}{P_2}\\frac{T_2}{T_1} = V_1 \\frac{1}{2}\\frac{1}{2} = \\frac{V_1}{4}$.' },
+                        { id: 'l_ck_8', level: 3, question: 'Một bình kín chứa khí ở $27^\\circ C$ và áp suất $2$ atm. Nếu làm nóng bình đến $127^\\circ C$ thì áp suất khí trong bình là bao nhiêu? (Coi thể tích bình không đổi)', options: ['A. $\\approx 2.67$ atm', 'B. $1.5$ atm', 'C. $3$ atm', 'D. $9.4$ atm'], answer: 'A', solution: 'Đẳng tích. Đổi nhiệt độ sang Kelvin: $T_1 = 300K, T_2 = 400K$. Áp dụng định luật Charles: $\\frac{P_2}{P_1} = \\frac{T_2}{T_1} \\Rightarrow P_2 = 2 \\cdot \\frac{400}{300} \\approx 2.67$ atm.' },
+                    ]
+                },
+                formulas: `...`
+            },
+            "su": {
+                name: "Lịch Sử",
+                subtopics: {
+                    "khang-chien-chong-phap": "Kháng chiến chống Pháp (1945-1954)",
+                    "khang-chien-chong-my": "Kháng chiến chống Mỹ (1954-1975)"
+                },
+                questions: {
+                    "khang-chien-chong-phap": [
+                        { id: 's_fr_1', question: 'Cuộc kháng chiến chống Pháp (1945-1954) kết thúc bằng chiến thắng nào?', options: ['A. Chiến dịch Điện Biên Phủ', 'B. Chiến dịch Biên giới Thu Đông', 'C. Chiến dịch Việt Bắc', 'D. Tổng khởi nghĩa tháng Tám'], answer: 'A', solution: 'Chiến thắng Điện Biên Phủ (7/5/1954) đã đập tan hoàn toàn kế hoạch Navarre, giáng đòn quyết định vào ý chí xâm lược của Pháp.' },
+                        { id: 's_fr_2', question: 'Nguyên nhân cơ bản nhất dẫn đến thắng lợi của cuộc kháng chiến chống Pháp là gì?', options: ['A. Sự lãnh đạo sáng suốt của Đảng và Chủ tịch Hồ Chí Minh', 'B. Sự giúp đỡ của các nước xã hội chủ nghĩa', 'C. Tinh thần đoàn kết của nhân dân Đông Dương', 'D. Quân đội Pháp suy yếu'], answer: 'A', solution: 'Sự lãnh đạo đúng đắn của Đảng với đường lối kháng chiến đúng đắn là nhân tố quyết định hàng đầu mọi thắng lợi.' },
+                        { id: 's_fr_4', question: 'Hiệp định nào được kí kết sau chiến thắng Điện Biên Phủ, chấm dứt chiến tranh ở Đông Dương?', options: ['A. Hiệp định Sơ bộ', 'B. Tạm ước 14/9', 'C. Hiệp định Genève 1954', 'D. Hiệp định Paris 1973'], answer: 'C', solution: 'Hiệp định Genève 1954 công nhận độc lập, chủ quyền, thống nhất và toàn vẹn lãnh thổ của ba nước Đông Dương.' },
+                        { id: 's_fr_5', question: 'Thắng lợi của chiến dịch Biên giới Thu-Đông 1950 có ý nghĩa gì?', options: ['A. Kết thúc hoàn toàn chiến tranh', 'B. Giành được thế chủ động trên chiến trường chính Bắc Bộ', 'C. Mở đầu cho cuộc tổng tấn công', 'D. Buộc Pháp phải rút quân'], answer: 'B', solution: 'Thắng lợi của chiến dịch Biên giới đã phá tan thế bao vây của địch và giúp quân ta giành được thế chủ động chiến lược.' },
+                        { id: 's_fr_6', question: 'Đâu là văn kiện thể hiện rõ nhất đường lối kháng chiến chống Pháp của ta?', options: ['A. Lời kêu gọi toàn quốc kháng chiến', 'B. Tác phẩm "Kháng chiến nhất định thắng lợi"', 'C. Chỉ thị "Toàn dân kháng chiến"', 'D. Cả A, B, C'], answer: 'D', solution: 'Cả ba văn kiện trên đều thể hiện rõ đường lối "toàn dân, toàn diện, trường kỳ, tự lực cánh sinh và tranh thủ sự ủng hộ quốc tế".' },
+                        { id: 's_fr_7', question: 'Phương châm chiến lược của ta trong cuộc tấn công Đông-Xuân 1953-1954 là gì?', options: ['A. Đánh nhanh thắng nhanh', 'B. Tích cực, chủ động, cơ động, linh hoạt', 'C. Đánh chắc tiến chắc', 'D. Vừa đánh vừa đàm phán'], answer: 'B', solution: 'Phương châm của ta là "Tích cực, chủ động, cơ động, linh hoạt", "đánh chắc, tiến chắc", buộc địch phải phân tán lực lượng.' },
+                    ],
+                    "khang-chien-chong-my": [
+                        { id: 's_my_1', question: 'Sự kiện nào đánh dấu sự kết thúc thắng lợi cuộc kháng chiến chống Mỹ?', options: ['A. Chiến dịch Hồ Chí Minh', 'B. Tổng tiến công Mậu Thân 1968', 'C. "Điện Biên Phủ trên không" 1972', 'D. Ký kết Hiệp định Paris 1973'], answer: 'A', solution: 'Chiến dịch Hồ Chí Minh lịch sử (30/4/1975) đã giải phóng hoàn toàn miền Nam, thống nhất đất nước.' },
+                        { id: 's_my_2', question: 'Sự kiện nào được xem là bước ngoặt của cuộc kháng chiến, buộc Mỹ phải "phi Mỹ hóa" chiến tranh?', options: ['A. Tổng tiến công và nổi dậy Mậu Thân 1968', 'B. "Điện Biên Phủ trên không" 1972', 'C. Phong trào Đồng Khởi 1959-1960', 'D. Chiến thắng Ấp Bắc'], answer: 'A', solution: 'Cuộc Tổng tiến công và nổi dậy Xuân Mậu Thân 1968 đã làm lung lay ý chí xâm lược của Mỹ, buộc Mỹ phải xuống thang chiến tranh.' },
+                        { id: 's_my_4', question: 'Chiến thắng nào đã đánh bại hoàn toàn cuộc tập kích chiến lược bằng B52 của Mỹ vào Hà Nội cuối năm 1972?', options: ['A. Chiến dịch Hồ Chí Minh', 'B. Điện Biên Phủ trên không', 'C. Mậu Thân 1968', 'D. Trận Vạn Tường'], answer: 'B', solution: 'Chiến thắng "Điện Biên Phủ trên không" đã đập tan uy thế không lực Hoa Kỳ và buộc Mỹ phải ký Hiệp định Paris.' },
+                        { id: 's_my_7', question: 'Bản chất của chiến lược "Việt Nam hóa chiến tranh" của Mỹ là gì?', options: ['A. "Dùng người Việt đánh người Việt"', 'B. Rút toàn bộ quân Mỹ về nước', 'C. Tăng cường viện trợ kinh tế', 'D. Kết thúc chiến tranh bằng đàm phán'], answer: 'A', solution: 'Đây là âm mưu của Mỹ nhằm thay màu da trên xác chết, tiếp tục cuộc chiến tranh xâm lược bằng quân đội Sài Gòn.' },
+                        { id: 's_my_8', question: 'Chiến thắng nào của quân dân miền Nam đã làm phá sản về cơ bản chiến lược "Chiến tranh đặc biệt" của Mỹ?', options: ['A. Bình Giã', 'B. Ấp Bắc', 'C. Vạn Tường', 'D. Đồng Xoài'], answer: 'A', solution: 'Chiến thắng Bình Giã (12/1964) đã làm phá sản về cơ bản chiến lược "Chiến tranh đặc biệt" của đế quốc Mỹ.' },
+                        { id: 's_my_9', question: 'Đại hội đại biểu toàn quốc lần thứ III của Đảng (9/1960) đã xác định nhiệm vụ của cách mạng miền Bắc là gì?', options: ['A. Xây dựng chủ nghĩa xã hội', 'B. Tiến hành cách mạng dân tộc dân chủ nhân dân', 'C. Chống đế quốc Mỹ và tay sai', 'D. Thống nhất đất nước'], answer: 'A', solution: 'Đại hội III xác định miền Bắc có vai trò là hậu phương lớn, thực hiện nhiệm vụ xây dựng chủ nghĩa xã hội để chi viện cho tiền tuyến miền Nam.' },
+                        { id: 's_my_10', question: 'Hiệp định Paris về Việt Nam được ký kết vào ngày tháng năm nào?', options: ['A. 27/01/1973', 'B. 30/04/1975', 'C. 02/09/1945', 'D. 07/05/1954'], answer: 'A', solution: 'Hiệp định Paris về chấm dứt chiến tranh, lập lại hòa bình ở Việt Nam được ký chính thức vào ngày 27/01/1973.' },
+                    ]
+                },
+                formulas: ``
+            },
+            "xa-hoi": {
+                name: "Kiến thức Xã hội",
+                questions: [
+                    { id: 'xh_1', question: 'Thủ đô của Việt Nam là thành phố nào?', options: ['A. Thành phố Hồ Chí Minh', 'B. Đà Nẵng', 'C. Hà Nội', 'D. Huế'], answer: 'C', solution: 'Thủ đô của nước Cộng hòa Xã hội Chủ nghĩa Việt Nam là Hà Nội.' },
+                    { id: 'xh_2', question: 'Tổ chức nào của Liên Hợp Quốc hoạt động về giáo dục, khoa học và văn hóa?', options: ['A. WHO', 'B. UNICEF', 'C. UNESCO', 'D. WTO'], answer: 'C', solution: 'UNESCO (United Nations Educational, Scientific and Cultural Organization) là Tổ chức Giáo dục, Khoa học và Văn hóa của Liên Hợp Quốc.' },
+                    { id: 'xh_3', question: 'Nguồn năng lượng nào được coi là năng lượng tái tạo?', options: ['A. Than đá', 'B. Dầu mỏ', 'C. Năng lượng mặt trời', 'D. Khí đốt tự nhiên'], answer: 'C', solution: 'Năng lượng mặt trời là năng lượng tái tạo. Than đá, dầu mỏ và khí đốt là nhiên liệu hóa thạch.' },
+                    { id: 'xh_4', question: 'Mục tiêu chính của phát triển bền vững là gì?', options: ['A. Chỉ tập trung vào tăng trưởng kinh tế', 'B. Đáp ứng nhu cầu của hiện tại mà không làm tổn hại đến khả năng đáp ứng nhu cầu của các thế hệ tương lai', 'C. Chỉ tập trung bảo vệ môi trường', 'D. Ưu tiên phát triển các nước giàu'], answer: 'B', solution: 'Phát triển bền vững là sự phát triển cân bằng giữa kinh tế, xã hội và môi trường.' },
+                    { id: 'xh_5', question: 'Tổ chức nào có mục tiêu chính là duy trì hòa bình và an ninh quốc tế?', options: ['A. EU', 'B. ASEAN', 'C. Liên Hợp Quốc (UN)', 'D. WTO'], answer: 'C', solution: 'Liên Hợp Quốc (UN) được thành lập với mục tiêu chính là duy trì hòa bình và an ninh quốc tế.' },
+                    { id: 'xh_7', question: 'Văn bản pháp luật nào có hiệu lực pháp lý cao nhất tại Việt Nam?', options: ['A. Bộ luật Dân sự', 'B. Luật Đất đai', 'C. Hiến pháp', 'D. Luật Giáo dục'], answer: 'C', solution: 'Hiến pháp là luật cơ bản của nhà nước, có hiệu lực pháp lý cao nhất.' },
+                    { id: 'xh_new_1', question: 'Trong các tỉnh sau, tỉnh nào không có đường bờ biển: Hải Dương, Thái Bình, Nam Định, Quảng Ninh?', options: ['A. Hải Dương', 'B. Thái Bình', 'C. Nam Định', 'D. Quảng Ninh'], answer: 'A', solution: 'Hải Dương là tỉnh duy nhất trong các tỉnh trên không giáp biển.' },
+                    { id: 'xh_new_2', question: '“Mặt Trời của thi ca Nga đã lặn mất rồi!” – báo chí Nga đưa tin như vậy khi ông qua đời. Ông là ai?', options: ['A. Lev Tolstoy', 'B. Fyodor Dostoevsky', 'C. Aleksandr Pushkin', 'D. Anton Chekhov'], answer: 'C', solution: 'Câu nói trên nói về sự ra đi của đại thi hào Aleksandr Pushkin.' },
+                    { id: 'xh_new_3', question: 'Quốc hiệu đầu tiên của nước ta là gì?', options: ['A. Đại Việt', 'B. Đại Cồ Việt', 'C. Âu Lạc', 'D. Văn Lang'], answer: 'D', solution: 'Quốc hiệu đầu tiên của nước ta là Văn Lang, gắn liền với thời đại Hùng Vương.' },
+                    { id: 'xh_new_4', question: 'Trong chiến dịch Điện Biên Phủ, người anh hùng nào đã lấy thân mình chèn pháo?', options: ['A. Phan Đình Giót', 'B. Tô Vĩnh Diện', 'C. Bế Văn Đàn', 'D. La Văn Cầu'], answer: 'B', solution: 'Anh hùng Tô Vĩnh Diện đã anh dũng hy sinh, lấy thân mình chèn bánh pháo.' },
+                    { id: 'xh_new_5', question: 'Vĩ tuyến 17 chạy ngang qua địa phận tỉnh nào của nước ta?', options: ['A. Quảng Bình', 'B. Hà Tĩnh', 'C. Quảng Trị', 'D. Thừa Thiên Huế'], answer: 'C', solution: 'Sông Bến Hải ở tỉnh Quảng Trị, nơi có vĩ tuyến 17 chạy qua, là giới tuyến quân sự tạm thời sau Hiệp định Genève 1954.' },
+                    { id: 'xh_new_6', question: 'Khi bị ong đốt, bôi vôi vào vết thương là ứng dụng của loại phản ứng hóa học nào?', options: ['A. Oxi hóa - khử', 'B. Trung hòa', 'C. Thế', 'D. Phân hủy'], answer: 'B', solution: 'Nọc ong chứa axit, vôi là bazơ. Bôi vôi giúp trung hòa axit, làm giảm sưng đau.' },
+                    { id: 'xh_new_7', question: 'Hệ Mặt trời của chúng ta nằm trong thiên hà nào?', options: ['A. Thiên hà Tiên Nữ', 'B. Thiên hà Tam Giác', 'C. Dải Ngân hà (Milky Way)', 'D. Thiên hà Xoáy Nước'], answer: 'C', solution: 'Hệ Mặt trời của chúng ta là một phần của Dải Ngân hà (Milky Way).' },
+                    { id: 'xh_new_8', question: '“Trái tim lầm lỡ để trên đầu/ Nỏ thần vô ý trao tay giặc” là những lời thơ Tố Hữu viết về ai?', options: ['A. An Dương Vương', 'B. Trọng Thủy', 'C. Mị Châu', 'D. Triệu Đà'], answer: 'C', solution: 'Hai câu thơ trên của Tố Hữu nói về nhân vật Mị Châu trong truyền thuyết An Dương Vương.' },
+                    { id: 'xh_new_11', question: 'Nguyễn Tuân đã viết về món ăn nào: “Vào mùa nắng, ăn một bát, ra mồ hôi, gặp cơn gió nhẹ chạy qua... thấy như giời quạt cho mình”?', options: ['A. Bún chả', 'B. Bún riêu', 'C. Phở', 'D. Bún thang'], answer: 'C', solution: 'Đây là những dòng văn nổi tiếng của nhà văn Nguyễn Tuân khi viết về món Phở.' },
+                    { id: 'xh_new_12', question: 'Đợt rét muộn cuối cùng vào tháng ba âm lịch ở miền Bắc thường được gọi là gì?', options: ['A. Rét đậm', 'B. Rét hại', 'C. Rét Nàng Bân', 'D. Rét ngọt'], answer: 'C', solution: 'Đợt rét này được gọi là rét Nàng Bân, gắn liền với sự tích nàng Bân may áo cho chồng.' },
+                    { id: 'xh_new_13', question: 'Ai là người được tặng Huân chương Sao Vàng đầu tiên ở nước ta?', options: ['A. Hồ Chí Minh', 'B. Võ Nguyên Giáp', 'C. Trường Chinh', 'D. Tôn Đức Thắng'], answer: 'D', solution: 'Chủ tịch Tôn Đức Thắng là người đầu tiên được trao tặng Huân chương Sao Vàng vào năm 1958.' },
+                    { id: 'xh_new_15', question: 'Loại hình sân khấu cải lương có nguồn gốc ở miền nào của Việt Nam?', options: ['A. Miền Bắc', 'B. Miền Trung', 'C. Nam Bộ', 'D. Tây Nguyên'], answer: 'C', solution: 'Cải lương là một loại hình nghệ thuật sân khấu truyền thống ra đời ở Nam Bộ vào đầu thế kỷ 20.' },
+                ]
+            },
+            "formulas": {
+                name: "Công thức", 
+                formulas: `
+                     <h3 class="text-xl font-semibold mb-3">Toán học: Nguyên hàm & Tích phân</h3>
+                    <h4 class="text-lg font-semibold mb-2">Bảng nguyên hàm cơ bản</h4>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>$\\int k dx = kx + C$</li>
+                        <li>$\\int x^{n} dx = \\frac{x^{n+1}}{n+1} + C$ (n $\\neq$ -1)</li>
+                        <li>$\\int \\frac{1}{x} dx = \\ln|x| + C$</li>
+                        <li>$\\int e^{x} dx = e^{x} + C$</li>
+                        <li>$\\int a^{x} dx = \\frac{a^{x}}{\\ln(a)} + C$</li>
+                        <li>$\\int \\cos(x) dx = \\sin(x) + C$</li>
+                        <li>$\\int \\sin(x) dx = -\\cos(x) + C$</li>
+                    </ul>
+                    <h3 class="text-xl font-semibold mt-6 mb-3">Toán học: Hình học Oxyz</h3>
+                     <h4 class="text-lg font-semibold mb-2">Phương trình mặt phẳng</h4>
+                    <p>Mặt phẳng $(P)$ đi qua $M(x_0; y_0; z_0)$ và có VTPT $\\vec{n}=(A;B;C):$</p>
+                    <p class="font-mono bg-gray-100 p-2 rounded">$A(x-x_0) + B(y-y_0) + C(z-z_0) = 0$</p>
+                    <h4 class="text-lg font-semibold mt-4 mb-2">Phương trình mặt cầu</h4>
+                    <p>Mặt cầu $(S)$ tâm $I(a; b; c)$ và bán kính $R:$</p>
+                     <p class="font-mono bg-gray-100 p-2 rounded">$(x-a)^2 + (y-b)^2 + (z-c)^2 = R^2$</p>
+                    <div class="mt-8 border-t pt-6"></div>
+                    <h3 class="text-xl font-semibold mb-3">Vật lý: Dao động điều hòa</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Phương trình dao động: $x = A \\cos(\\omega t + \\phi)$</li>
+                        <li>Hệ thức độc lập: $A^2 = x^2 + \\frac{v^2}{\\omega^2}$</li>
+                        <li>Cơ năng: $W = \\frac{1}{2}kA^2 = const$</li>
+                    </ul>
+                    <h3 class="text-xl font-semibold mt-6 mb-3">Vật lý: Sóng cơ & Sóng ánh sáng</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Bước sóng: $\\lambda = vT = \\frac{v}{f}$</li>
+                         <li>Giao thoa sóng (vân sáng): $x_s = k \\frac{\\lambda D}{a}$</li>
+                         <li>Giao thoa sóng (vân tối): $x_t = (k + \\frac{1}{2}) \\frac{\\lambda D}{a}$</li>
+                    </ul>
+                `
+            }
+        };
+
+        let currentSubject = null;
+        let currentSubtopic = null;
+        let currentLevel = 'all';
+        let userAnswers = {};
+        let progressChart;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNav();
+            initLevelFilters();
+            initChart();
+            document.getElementById('reset-btn').addEventListener('click', resetQuiz);
+        });
+
+        function initNav() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const subjectId = e.currentTarget.id.replace('nav-', '');
+                    setActiveSubject(subjectId);
+                });
+            });
+        }
+
+        function initSubNav(subjectId) {
+            document.querySelectorAll('[id^="sub-nav-"]').forEach(div => {
+                div.innerHTML = '';
+                div.classList.add('hidden');
+            });
+            
+            const subNavContainer = document.getElementById(`sub-nav-${subjectId}`);
+            if (subNavContainer && quizData[subjectId].subtopics) {
+                for (const subtopicId in quizData[subjectId].subtopics) {
+                    const subtopicName = quizData[subjectId].subtopics[subtopicId];
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.id = `sub-nav-${subjectId}-${subtopicId}`;
+                    link.className = 'sub-nav-link block px-4 py-2 text-sm rounded-lg text-gray-600 hover:bg-gray-100';
+                    link.textContent = subtopicName;
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setActiveSubtopic(subjectId, subtopicId);
+                    });
+                    subNavContainer.appendChild(link);
+                }
+                subNavContainer.classList.remove('hidden');
+            }
+        }
+        
+        function initLevelFilters() {
+            const filterButtons = document.querySelectorAll('.level-filter-btn');
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentLevel = btn.dataset.level;
+                    filterButtons.forEach(b => {
+                        b.classList.remove('bg-indigo-100', 'text-indigo-700');
+                        b.classList.add('bg-gray-200', 'text-gray-600');
+                    });
+                    btn.classList.add('bg-indigo-100', 'text-indigo-700');
+                    btn.classList.remove('bg-gray-200', 'text-gray-600');
+                    if(currentSubject && currentSubject !== 'formulas') {
+                         renderQuestions();
+                    }
+                });
+            });
+        }
+
+        function setActiveSubject(subjectId) {
+            currentSubject = subjectId;
+            currentSubtopic = null; 
+            userAnswers = {};
+            currentLevel = 'all'; 
+
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.getElementById('nav-' + subjectId).classList.add('active');
+            
+            initSubNav(subjectId); 
+
+            document.getElementById('welcome-view').classList.add('hidden');
+            document.getElementById('filter-section').classList.add('hidden');
+
+            if (subjectId === 'formulas') {
+                document.getElementById('quiz-view').classList.add('hidden');
+                document.getElementById('formulas-view').classList.remove('hidden');
+                renderFormulas();
+            } else {
+                document.getElementById('formulas-view').classList.add('hidden');
+                document.getElementById('quiz-view').classList.remove('hidden');
+                document.getElementById('topic-title').textContent = quizData[subjectId].name;
+
+                if (subjectId === 'toan' || subjectId === 'ly') {
+                    document.getElementById('filter-section').classList.remove('hidden');
+                }
+
+                if (quizData[subjectId].subtopics) {
+                    document.getElementById('question-list').innerHTML = `<p class="text-gray-500 text-center col-span-full">Vui lòng chọn một chủ đề con để bắt đầu.</p>`;
+                    updateSummary(true);
+                } else {
+                    document.getElementById(`sub-nav-${subjectId}`)?.classList.add('hidden');
+                    resetLevelFilters();
+                    renderQuestions();
+                }
+            }
+        }
+
+        function setActiveSubtopic(subjectId, subtopicId) {
+            currentSubtopic = subtopicId;
+            userAnswers = {};
+            currentLevel = 'all'; 
+
+            document.querySelectorAll('.sub-nav-link').forEach(link => link.classList.remove('active'));
+            document.getElementById(`sub-nav-${subjectId}-${subtopicId}`).classList.add('active');
+            
+            if (subjectId === 'toan' || subjectId === 'ly') {
+                document.getElementById('filter-section').classList.remove('hidden');
+            } else {
+                document.getElementById('filter-section').classList.add('hidden');
+            }
+
+            resetLevelFilters();
+            document.getElementById('topic-title').textContent = `${quizData[subjectId].subtopics[subtopicId]}`;
+            renderQuestions();
+        }
+
+        function resetLevelFilters() {
+            document.querySelectorAll('.level-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-100', 'text-indigo-700');
+                btn.classList.add('bg-gray-200', 'text-gray-600');
+                if (btn.dataset.level === 'all') {
+                    btn.classList.add('bg-indigo-100', 'text-indigo-700');
+                    btn.classList.remove('bg-gray-200', 'text-gray-600');
+                }
+            });
+        }
+
+        function renderFormulas() {
+            const contentDiv = document.getElementById('formulas-content');
+            contentDiv.innerHTML = quizData['formulas'].formulas;
+            if (window.MathJax) {
+                window.MathJax.typesetPromise([contentDiv]).catch((err) => console.error("MathJax typesetting failed", err));
+            }
+        }
+
+        function renderQuestions() {
+            const questionList = document.getElementById('question-list');
+            questionList.innerHTML = '';
+            
+            let questionsSource = [];
+            if (currentSubtopic) {
+                questionsSource = quizData[currentSubject].questions[currentSubtopic];
+            } else if (currentSubject && quizData[currentSubject].questions) {
+                questionsSource = quizData[currentSubject].questions;
+            } else {
+                questionList.innerHTML = `<p class="text-gray-500 text-center col-span-full">Vui lòng chọn một chủ đề để bắt đầu.</p>`;
+                updateSummary(true);
+                return;
+            }
+
+            const questionsToRender = questionsSource.filter(q => {
+                if (q.level !== undefined) {
+                    return currentLevel === 'all' || q.level == currentLevel;
+                }
+                return true; 
+            });
+
+            if (questionsToRender.length === 0) {
+                 questionList.innerHTML = `<p class="text-gray-500 text-center col-span-full">Không có câu hỏi nào cho mức độ này.</p>`;
+            }
+
+            questionsToRender.forEach((q, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'bg-white p-6 rounded-xl shadow-md';
+                questionCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="font-semibold text-gray-700"><span class="text-indigo-600 font-bold">Câu ${index + 1}:</span> ${q.question}</p>
+                        ${q.level ? `<span class="text-xs font-bold uppercase px-2 py-1 rounded-full ${q.level === 1 ? 'bg-blue-100 text-blue-800' : q.level === 2 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">Mức ${q.level}</span>` : ''}
+                    </div>
+                    <div id="options-${q.id}" class="space-y-3">
+                        ${q.options.map((opt, i) => {
+                             const optionLetter = String.fromCharCode(65 + i);
+                             const optionText = opt.startsWith(optionLetter + '.') ? opt.substring(2).trim() : opt;
+                             return `<button data-question-id="${q.id}" data-option="${optionLetter}" class="option-btn w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100">
+                                        <span class="font-bold mr-2">${optionLetter}.</span>
+                                        <span>${optionText}</span>
+                                     </button>`
+                         }).join('')}
+                    </div>
+                    <div id="solution-${q.id}" class="solution-box mt-4 p-4 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200 hidden">
+                        <p class="font-semibold">Giải thích:</p>
+                        <p>${q.solution || 'Chưa có lời giải thích.'}</p>
+                    </div>
+                `;
+                questionList.appendChild(questionCard);
+            });
+            
+            addOptionEventListeners();
+            updateSummary();
+            if (window.MathJax) {
+                window.MathJax.typesetPromise([questionList]).catch((err) => console.error("MathJax typesetting failed", err));
+            }
+        }
+        
+        function addOptionEventListeners() {
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    handleOptionSelect(btn.dataset.questionId, btn.dataset.option);
+                });
+            });
+        }
+
+        function handleOptionSelect(questionId, selectedOption) {
+            if (userAnswers[questionId]) return; 
+
+            userAnswers[questionId] = selectedOption;
+            
+            let questionData;
+            if (currentSubtopic) {
+                questionData = quizData[currentSubject].questions[currentSubtopic].find(q => q.id === questionId);
+            } else {
+                questionData = quizData[currentSubject].questions.find(q => q.id === questionId);
+            }
+
+            const optionsContainer = document.getElementById(`options-${questionId}`);
+            const allOptions = optionsContainer.querySelectorAll('.option-btn');
+            const selectedElement = optionsContainer.querySelector(`[data-option="${selectedOption}"]`);
+            const solutionBox = document.getElementById(`solution-${questionId}`);
+
+            const isCorrect = selectedOption === questionData.answer;
+
+            allOptions.forEach(opt => {
+                opt.disabled = true;
+                opt.classList.remove('hover:bg-gray-100');
+                const optionLetter = opt.dataset.option;
+                if (optionLetter === questionData.answer) {
+                    opt.classList.add('correct');
+                }
+            });
+
+            if (!isCorrect) {
+                selectedElement.classList.add('incorrect');
+            }
+            solutionBox.classList.remove('hidden');
+            
+            updateSummary();
+        }
+        
+        function updateSummary(clear = false) {
+            if (clear || !currentSubject) {
+                document.getElementById('correct-count').textContent = 0;
+                document.getElementById('total-answered').textContent = 0;
+                updateChart(0, 0, 1);
+                return;
+            }
+
+            let questions = [];
+            if (currentSubtopic) {
+                questions = quizData[currentSubject].questions[currentSubtopic];
+            } else if (currentSubject && quizData[currentSubject].questions) {
+                questions = quizData[currentSubject].questions;
+            } else {
+                 document.getElementById('correct-count').textContent = 0;
+                document.getElementById('total-answered').textContent = 0;
+                updateChart(0, 0, 1);
+                return;
+            }
+            
+            const filteredQuestions = questions.filter(q => currentLevel === 'all' || !q.level || q.level == currentLevel);
+            if (!filteredQuestions.length) {
+                document.getElementById('correct-count').textContent = 0;
+                document.getElementById('total-answered').textContent = 0;
+                updateChart(0, 0, 0); // No questions, so all zero
+                return;
+            }
+
+            const totalAnswered = Object.keys(userAnswers).filter(id => filteredQuestions.some(q => q.id === id)).length;
+            let correctCount = 0;
+            for (const qId in userAnswers) {
+                const question = filteredQuestions.find(q => q.id === qId);
+                if (question && userAnswers[qId] === question.answer) {
+                    correctCount++;
+                }
+            }
+            
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const incorrectCount = totalAnswered - correctCount;
+            const unansweredCount = filteredQuestions.length - totalAnswered;
+            updateChart(correctCount, incorrectCount, unansweredCount);
+        }
+        
+        function resetQuiz() {
+            userAnswers = {};
+            if(currentSubject && currentSubject !== 'formulas') {
+                renderQuestions(); 
+            }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            progressChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Đúng', 'Sai', 'Chưa trả lời'],
+                    datasets: [{
+                        data: [0, 0, 1], // Start with 100% unanswered
+                        backgroundColor: [
+                            '#22c55e', // green-500
+                            '#ef4444', // red-500
+                            '#e5e7eb'  // gray-200
+                        ],
+                        borderColor: '#f8f9fa',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                boxWidth: 12,
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: { enabled: true }
+                    }
+                }
+            });
+        }
+
+        function updateChart(correct, incorrect, unanswered) {
+            progressChart.data.datasets[0].data = [correct, incorrect, unanswered];
+            if (correct === 0 && incorrect === 0 && unanswered === 0) {
+                progressChart.data.datasets[0].data = [0, 0, 1];
+            }
+            progressChart.update();
+        }
+    </script>
+</body>
+</html>
